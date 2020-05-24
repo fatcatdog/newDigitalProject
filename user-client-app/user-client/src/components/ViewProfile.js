@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/ViewProfile.css';
+import Header from './Header.js';
 
 function ViewProfile() {
   const [username, setUsername] = useState("Jacob Duchen");
@@ -154,6 +155,8 @@ function ViewProfile() {
 
   return (
     <div className="Home">
+      <Header />
+
       <h1>Book a Conversation With Jacob</h1>
 
       <div className="bigParagraph">

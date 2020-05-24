@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import '../styles/EditProfile.css';
+import Header from './Header.js';
 
 function EditProfile() {
   const [username, setUsername] = useState("Jacob Duchen");
@@ -36,6 +37,8 @@ function EditProfile() {
   const [intro, setIntro] = useState("");
 
   const [shortBio, setShortBio] = useState("");
+
+
   const [longBio, setLongBio] = useState("");
 
   const [tempShortBio, setTempShortBio] = useState(shortBio);
@@ -634,17 +637,21 @@ function EditProfile() {
 
     const handleUpload = async e => {
       e.preventDefault();
-      const formData = new FormData();
-      formData.append("image", image.raw);
 
-      // await fetch("YOUR_URL", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "multipart/form-data"
-      //   },
-      //   body: formData
-      // });
-      alert(image.raw);
+      const fileData = new FormData()
+      fileData.append('file', image.raw)
+
+      fetch('http://localhost:8080/api/changePhoto', {
+        method: 'POST',
+        body: fileData
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+      })
+      .catch(error => {
+        console.error(error)
+      })
     };
 
   const importantStyleObj = {
@@ -795,10 +802,26 @@ function EditProfile() {
 
   function handleSetMediumsPricesTable(e){
     e.preventDefault();
-    console.log("clicked submit table information");
-    console.log(messagingRate);
-    console.log(voiceRate);
-    console.log(videoRate);
+
+    let enabled = [messageEnabled, voiceEnabled, videoEnabled];
+    let rates = [messagingRate, voiceRate, videoRate];
+    let payload = ({"enabled" : enabled, "rates": rates});
+
+    fetch('http://localhost:8080/api/changeMediumsPrices', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+       },
+      body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data)
+    })
+    .catch(error => {
+      console.error(error)
+    })
+
   }
 
   const mediumList = mediums.map((m) =>
@@ -847,22 +870,74 @@ function EditProfile() {
 
   function handleSaveTempShortBio(e) {
     e.preventDefault();
-    setShortBio(tempShortBio);
-    // setTempShortBio();
+    let payload = ({content : tempShortBio });
+    fetch('http://localhost:8080/api/changeShortBio', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+       },
+      body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+      setShortBio(tempShortBio);
+      console.log(data)
+    })
+    .catch(error => {
+      console.error(error)
+    })
   }
 
   function handleSaveTempLongBio(e) {
     e.preventDefault();
-    setLongBio(tempLongBio);
-    // setTempShortBio();
+    let payload = ({content : tempLongBio });
+    fetch('http://localhost:8080/api/changeLongBio', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+       },
+      body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+      setLongBio(tempLongBio);
+      console.log(data)
+    })
+    .catch(error => {
+      console.error(error)
+    })
   }
 
-  function handleSaveDateTimes() {
-    console.log("Saving date time!");
+  function handleSaveDateTimes(e) {
+    e.preventDefault();
+
+    console.log("Saving date times!");
+
+    let days = [monday, tuesday, wednesday, thursday, friday];
+    let times = [mondayTimes, tuesdayTimes, wednesdayTimes, thursdayTimes, fridayTimes];
+
+    let payload = ({"days" : days, "times": times});
+
+    fetch('http://localhost:8080/api/changeDaysTimes', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+       },
+      body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data)
+    })
+    .catch(error => {
+      console.error(error)
+    })
+
   }
 
   return (
     <div className="Home">
+      <Header />
       <h1>Create/Edit Profile</h1>
 
       <div className="bigParagraph">
@@ -891,6 +966,7 @@ function EditProfile() {
           <br />
           <button onClick={handleUpload}>Save upload</button>
         </div>
+
         <br />
       <div className="bigParagraph">
         Short Bio
@@ -956,7 +1032,7 @@ function EditProfile() {
                 </td>
                 <td>
                  <button onClick={e => clickDecreaseRateButtonHandler(e, 0)}>-</button>
-                  {" "}{messagingRate}
+                  {" "}{messagingRate}{" "}
                  <button onClick={e => clickIncreaseRateButtonHandler(e, 0)}>+</button>
               </td>
               </tr>
@@ -973,7 +1049,7 @@ function EditProfile() {
                   </td>
                   <td>
                   <button onClick={e => clickDecreaseRateButtonHandler(e, 1)}>-</button>
-                    {" "}{voiceRate}
+                    {" "}{voiceRate}{" "}
                   <button onClick={e => clickIncreaseRateButtonHandler(e, 1)}>+</button>
                 </td>
               </tr>
@@ -990,7 +1066,7 @@ function EditProfile() {
                   </td>
                   <td>
                   <button onClick={e => clickDecreaseRateButtonHandler(e, 2)}>-</button>
-                    {" "}{videoRate}
+                    {" "}{videoRate}{" "}
                   <button onClick={e => clickIncreaseRateButtonHandler(e, 2)}>+</button>
                 </td>
               </tr>
@@ -1077,7 +1153,7 @@ function EditProfile() {
           </table>
             <br />
             <br />
-          <button onClick={handleSaveDateTimes}>Save date and times</button>
+          <button onClick={e => handleSaveDateTimes(e)}>Save date and times</button>
           </div>
 
         </form>
